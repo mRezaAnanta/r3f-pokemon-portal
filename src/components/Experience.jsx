@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Environment, MeshPortalMaterial, OrbitControls, RoundedBox, useTexture, Text } from "@react-three/drei";
 import * as THREE from "three";
 import Fish from "./Fish"
@@ -5,6 +6,7 @@ import Dragon from "./Dragon"
 import Cactus from "./Cactus"
 
 export const Experience = () => {
+  const [active, setActive] = useState(null)
 
   return (
     <>
@@ -15,6 +17,8 @@ export const Experience = () => {
         texture={'textures/anime_art_style_a_water_based_pokemon_like_environ.jpg'}
         name={"Fish"}
         color={"#38adcf"}
+        active={active}
+        setActive={setActive}
       >
         <Fish scale={0.6} position-y={-1} />
       </MonsterStage>
@@ -23,7 +27,10 @@ export const Experience = () => {
         name={"Dragon"}
         color={"#df8d52"}
         position-x={-2.5}
-        rotation-y={Math.PI / 8}>
+        rotation-y={Math.PI / 8}
+        active={active}
+        setActive={setActive}
+      >
         <Dragon scale={0.6} position-y={-1} />
       </MonsterStage>
       <MonsterStage
@@ -31,14 +38,17 @@ export const Experience = () => {
         name={"Cactus"}
         color={"#739d3c"}
         position-x={2.5}
-        rotation-y={-Math.PI / 8}>
+        rotation-y={-Math.PI / 8}
+        active={active}
+        setActive={setActive}
+      >
         <Cactus scale={0.6} position-y={-1} />
       </MonsterStage>
     </>
   );
 };
 
-const MonsterStage = ({ children, texture, name, color, ...props }) => {
+const MonsterStage = ({ children, texture, name, color, active, setActive, ...props }) => {
   const map = useTexture(texture)
   return <group {...props}>
     <Text
@@ -50,8 +60,8 @@ const MonsterStage = ({ children, texture, name, color, ...props }) => {
       {name}
       <meshBasicMaterial color={color} toneMapped={false} />
     </Text>
-    <RoundedBox args={[2, 3, 0.1]}>
-      <MeshPortalMaterial side={THREE.DoubleSide}>
+    <RoundedBox args={[2, 3, 0.1]} onDoubleClick={() => setActive(active === name ? null : name)}>
+      <MeshPortalMaterial side={THREE.DoubleSide} blend={active === name ? 1 : 0}>
         <ambientLight intensity={1} />
         <Environment preset="sunset" />
         {children}
