@@ -8,7 +8,7 @@ import { useGraph } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 
-export default function Cactus(props) {
+export default function Cactus({ hovered, ...props }) {
   const group = React.useRef()
   const { scene, animations } = useGLTF('/models/Cactoro.gltf')
   const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
@@ -17,9 +17,10 @@ export default function Cactus(props) {
   console.log(actions)
 
   useEffect(() => {
-    actions["Idle"].reset().fadeIn(0.5).play()
-    return () => actions["Idle"].fadeOut(0.5)
-  }, [])
+    const anim = hovered ? "Wave" : "Idle"
+    actions[anim].reset().fadeIn(0.5).play()
+    return () => actions[anim].fadeOut(0.5)
+  }, [hovered])
 
   return (
     <group ref={group} {...props} dispose={null}>
