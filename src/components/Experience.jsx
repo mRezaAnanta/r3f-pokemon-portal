@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Environment, MeshPortalMaterial, OrbitControls, RoundedBox, useTexture, Text } from "@react-three/drei";
 import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
+import { easing } from "maath"
+
 import Fish from "./Fish"
 import Dragon from "./Dragon"
 import Cactus from "./Cactus"
@@ -50,6 +53,13 @@ export const Experience = () => {
 
 const MonsterStage = ({ children, texture, name, color, active, setActive, ...props }) => {
   const map = useTexture(texture)
+  const portalMaterial = useRef()
+
+  useFrame((_state, delta) => {
+    const worldOpen = active === name
+    easing.damp(portalMaterial.current, "blend", worldOpen ? 1 : 0, 0.2, delta)
+  })
+
   return <group {...props}>
     <Text
       font="fonts/Caprasimo-Regular.ttf"
@@ -61,7 +71,11 @@ const MonsterStage = ({ children, texture, name, color, active, setActive, ...pr
       <meshBasicMaterial color={color} toneMapped={false} />
     </Text>
     <RoundedBox args={[2, 3, 0.1]} onDoubleClick={() => setActive(active === name ? null : name)}>
-      <MeshPortalMaterial side={THREE.DoubleSide} blend={active === name ? 1 : 0}>
+      <MeshPortalMaterial
+        ref={portalMaterial}
+        side={THREE.DoubleSide}
+      // blend={active === name ? 1 : 0}
+      >
         <ambientLight intensity={1} />
         <Environment preset="sunset" />
         {children}
